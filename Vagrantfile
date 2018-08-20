@@ -20,6 +20,17 @@ Vagrant.configure("2") do |config|
 	end
   
 	jenkins.vm.provision "shell", path: "vagrant_script/python_server.sh"      #inline: "echo Hello, World"
+	jenkins.vm.network "forwarded_port", guest: 9000, host: 9000
+  end
+    config.vm.define "ab" do |ab|
+	ab.vm.box = "centos/7"
+	ab.vm.provider "virtualbox" do |vb|
+		vb.memory = 1048
+		vb.cpus = 1
+	end
+  
+	ab.vm.provision "shell", path: "vagrant_script/python_server.sh"      #inline: "echo Hello, World"
+	ab.vm.network "forwarded_port", guest: 9000, host: 9001
   end
   #or
   #config.vm.provision "shell", inline: <<-SHELL
@@ -43,7 +54,7 @@ Vagrant.configure("2") do |config|
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
   # NOTE: This will enable public access to the opened port
-   config.vm.network "forwarded_port", guest: 9000, host: 9000
+  # config.vm.network "forwarded_port", guest: 9000, host: 9000
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine and only allow access
