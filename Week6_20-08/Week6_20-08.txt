@@ -1,0 +1,180 @@
+Tips:
+mkdir .... && cd $_ 
+https://dillinger.io/
+
+
+1)vagrant init centos/7  #creates a Vagrantfile
+
+#Info
+https://app.vagrantup.com/boxes/search
+2) vagrant up
+3) vagrant ssh
+4) ip addr
+5) to install python server create first the jenkins user (no need to change to it)
+and then make install the python server
+6) by using the ip address 192.168.33.10:9000 you can connect to the server	
+7) vagrant destroy  #destroy the vm
+8) vagrant up
+9) we change to "forwarded port" mode   #port forwarde the service to our host machine
+					so, localhost or ip address of the host machine:port number
+					192.168.1.22:9000
+forward a service from a VM to host and to the rest of the network
+
+10) vagrant provision 
+
+Vagrantfile:
+------------
+ config.vm.box = "centos/7"
+  config.vm.provider "virtualbox" do |vb|
+	vb.memory = 2048
+	vb.cpus = 2
+  end
+
+
+config.vm.network "private_network", ip: "192.168.33.10"	#line 38
+
+config.vm.network "forwarded_port", guest: 9000, host: 9000    #line 29
+
+
+
+Automate script:
+----------------
+1) create a script with those commands:
+	 config.vm.provision "shell", inline: <<-SHELL
+	sudo yum install -y git
+	sudo yum update
+	sudo useradd jenkins
+	sudo git clone https://github.com/bob-crutchley/python-systemd-http-server.git 
+	sudo cd python-systemd-http-server
+	sudo make install
+	sudo systemctl daemon-reload
+	sudo systemctl start python-systemd-http-server.service
+	sudo systemctl status python-systemd-http-server.service
+
+  SHELL
+
+OR
+--
+
+config.vm.provision "shell", path: "vagrant_script/python_server"   
+path: "vagrant_scripts/python_server"
+
+Example of code:
+  config.vm.define "jenkins" do |jenkins|
+	jenkins.vm.box = "centos/7"
+	jenkins.vm.provider "virtualbox" do |vb|
+		vb.memory = 2048
+		vb.cpus = 2
+	end
+  
+	jenkins.vm.provision "shell", path: "vagrant_script/python_server.sh"      #inline: "echo Hello, World"
+  end
+
+
+YML Files:
+----------
+
+At the top 
+---
+... 
+at the end
+
+Only use spaces
+
+its machine[0] starts from -name: util -startup
+
+example
+machine['packages'].each do |pkg|
+	inline: "....."
+end
+
+
+
+------------------------------------
+We replace the boxes with the yml file
+
+  config.vm.define "jenkins" do |jenkins|
+	jenkins.vm.box = "centos/7"
+	jenkins.vm.provider "virtualbox" do |vb|
+		vb.memory = 2048
+		vb.cpus = 2
+	end
+  
+	jenkins.vm.provision "shell", path: "vagrant_script/python_server.sh"      #inline: "echo Hello, World"
+	jenkins.vm.network "forwarded_port", guest: 9000, host: 9000
+  end
+    config.vm.define "ab" do |ab|
+	ab.vm.box = "centos/7"
+	ab.vm.provider "virtualbox" do |vb|
+		vb.memory = 1048
+		vb.cpus = 1
+	end
+  
+	ab.vm.provision "shell", path: "vagrant_script/python_server.sh"      #inline: "echo Hello, World"
+	ab.vm.network "forwarded_port", guest: 9000, host: 9001
+  end
+
+make it to yml 
+
+-------------------
+Part of code, version 2, using the yml file
+
+Vagrant.configure("2") do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+	guests.each do |guest|
+		config.vm.define guest['name'] do |guest_vm|
+			guest_vm.vm.box = guest['box']
+			guest_vm.vm.provider "virtualbox" do |vb|
+				vb.cpus = guest['cpus']
+				vb.memory = guest['memory']
+				end
+			guest_vm.vm.network "private_network", ip: guest['private_ip']
+			guest_vm.vm.provision "shell", inline: "sudo #{guest['package_manager']} update -y"
+			guest_vm.vm.provision "shell", privileged: false, path: "vagrant_script/python_server.sh"
+			guest_vm.vm.network "forwarded_port", guest: 9000, host: guest['port_for']
+		end
+	end
+end
+
+----------------
+Function code method
+
+
+require 'yaml'
+guests = YAML.load_file("guest_machines.yml")
+
+Vagrant.configure("2") do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+	guests.each do |guest|
+		config.vm.define guest['name'] do |guest_vm|
+			cpu_mem(guest, guest_vm)
+			box(guest, guest_vm)
+			network_conf(guest, guest_vm)
+			services(guest, guest_vm)
+		end
+	end
+  
+def cpu_mem(guest, guest_vm)
+	guest_vm.vm.provider "virtualbox" do |vb|
+		vb.cpus = guest['cpus']
+		vb.memory = guest['memory'] 
+	end
+end
+
+def box(guest, guest_vm)
+	guest_vm.vm.box = guest['box']
+end
+  
+def network_conf(guest, guest_vm)
+	guest_vm.vm.network "private_network", ip: guest['private_ip']
+end
+
+def services(guest, guest_vm)
+	guest_vm.vm.provision "shell", inline: "sudo #{guest['package_manager']} update -y"
+	guest_vm.vm.provision "shell", privileged: false, path: "vagrant_script/python_server.sh"
+	guest_vm.vm.network "forwarded_port", guest: 9000, host: guest['port_for']
+end

@@ -1,0 +1,26 @@
+- name: jenkins
+  box: centos/7
+  cpus: 2
+  memory: 4096 
+  private_ip: 10.0.10.10
+  package_manager: yum
+  port_for: 9000
+  packages:
+  - wget
+  - unzip
+  - git
+  scripts:
+  - startup
+- name: ab
+  box: centos/7
+  cpus: 1
+  memory: 2088 
+  private_ip: 10.0.10.11
+  package_manager: yum
+  port_for: 9001
+  packages:
+  - wget
+  - unzip
+  - git
+  scripts:
+  - startup

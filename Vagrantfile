@@ -5,33 +5,65 @@
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
+require 'yaml'
+guests = YAML.load_file("guest_machines.yml")
+
 Vagrant.configure("2") do |config|
   # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
   # https://docs.vagrantup.com.
+	guests.each do |guest|
+		config.vm.define guest['name'] do |guest_vm|
+			cpu_mem(guest, guest_vm)
+			box(guest, guest_vm)
+			network_conf(guest, guest_vm)
+			services(guest, guest_vm)
+		end
+	end
+  
+def cpu_mem(guest, guest_vm)
+	guest_vm.vm.provider "virtualbox" do |vb|
+		vb.cpus = guest['cpus']
+		vb.memory = guest['memory'] 
+	end
+end
 
+def box(guest, guest_vm)
+	guest_vm.vm.box = guest['box']
+end
+  
+def network_conf(guest, guest_vm)
+	guest_vm.vm.network "private_network", ip: guest['private_ip']
+end
+
+def services(guest, guest_vm)
+	guest_vm.vm.provision "shell", inline: "sudo #{guest['package_manager']} update -y"
+	guest_vm.vm.provision "shell", privileged: false, path: "vagrant_script/python_server.sh"
+	guest_vm.vm.network "forwarded_port", guest: 9000, host: guest['port_for']
+end
+ 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.define "jenkins" do |jenkins|
-	jenkins.vm.box = "centos/7"
-	jenkins.vm.provider "virtualbox" do |vb|
-		vb.memory = 2048
-		vb.cpus = 2
-	end
+  #config.vm.define "jenkins" do |jenkins|
+	#jenkins.vm.box = "centos/7"
+	#jenkins.vm.provider "virtualbox" do |vb|
+	#	vb.memory = 2048
+	#	vb.cpus = 2
+	#end
   
-	jenkins.vm.provision "shell", path: "vagrant_script/python_server.sh"      #inline: "echo Hello, World"
-	jenkins.vm.network "forwarded_port", guest: 9000, host: 9000
-  end
-    config.vm.define "ab" do |ab|
-	ab.vm.box = "centos/7"
-	ab.vm.provider "virtualbox" do |vb|
-		vb.memory = 1048
-		vb.cpus = 1
-	end
+	#jenkins.vm.provision "shell", path: "vagrant_script/python_server.sh"      #inline: "echo Hello, World"
+	#jenkins.vm.network "forwarded_port", guest: 9000, host: 9000
+  #end
+    #config.vm.define "ab" do |ab|
+	#ab.vm.box = "centos/7"
+	#ab.vm.provider "virtualbox" do |vb|
+	#	vb.memory = 1048
+	#	vb.cpus = 1
+	#end
   
-	ab.vm.provision "shell", path: "vagrant_script/python_server.sh"      #inline: "echo Hello, World"
-	ab.vm.network "forwarded_port", guest: 9000, host: 9001
-  end
+	#ab.vm.provision "shell", path: "vagrant_script/python_server.sh"      #inline: "echo Hello, World"
+	#ab.vm.network "forwarded_port", guest: 9000, host: 9001
+ #end
   #or
   #config.vm.provision "shell", inline: <<-SHELL
 	#sudo yum install -y git
