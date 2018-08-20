@@ -12,24 +12,26 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "centos/7"
-  config.vm.provider "virtualbox" do |vb|
-	vb.memory = 2048
-	vb.cpus = 2
-  end
+  config.vm.define "jenkins" do |jenkins|
+	jenkins.vm.box = "centos/7"
+	jenkins.vm.provider "virtualbox" do |vb|
+		vb.memory = 2048
+		vb.cpus = 2
+	end
   
-  #config.vm.provision "shell", inline: "echo Hello, World"
+	jenkins.vm.provision "shell", path: "vagrant_script/python_server.sh"      #inline: "echo Hello, World"
+  end
   #or
-  config.vm.provision "shell", inline: <<-SHELL
-	sudo yum install -y git
-	sudo yum update
-	sudo useradd jenkins
-	sudo git clone https://github.com/bob-crutchley/python-systemd-http-server.git && cd python-systemd-http-server
-	sudo make install
-	sudo systemctl daemon-reload
-	sudo systemctl start python-systemd-http-server.service
-	sudo systemctl status python-systemd-http-server.service
-  SHELL
+  #config.vm.provision "shell", inline: <<-SHELL
+	#sudo yum install -y git
+	#sudo yum update
+	#sudo useradd jenkins
+	#sudo git clone https://github.com/bob-crutchley/python-systemd-http-server.git && cd python-systemd-http-server
+	#sudo make install
+	#sudo systemctl daemon-reload
+	#sudo systemctl start python-systemd-http-server.service
+	#sudo systemctl status python-systemd-http-server.service
+  #SHELL
 	
   
   # Disable automatic box update checking. If you disable this, then
