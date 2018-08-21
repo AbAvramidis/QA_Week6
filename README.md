@@ -129,6 +129,8 @@ Is a mapped/ mounted folder
 
 # Implement a JSON file
 
+| good web source url: | [https://blog.scottlowe.org/2016/01/18/multi-machine-vagrant-json/]
+
  - At first check if a JSON file exists or a YMAL file.
  
         if(File.file?('servers.json'))
