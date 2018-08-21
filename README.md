@@ -120,3 +120,9 @@ Vagrant - Hypervisor - control manage and monitor the VMs creation, installation
  # Note: for synced folders the VirtualBox Guest Additions plugin must be installed for Vagrant:  
  
     -  vagrant plugin install vagrant-vbguest
+    
+    config.vm.synced_folder "shared", "/home/vagrant/shared"
+    
+- Basically, you can copy anything through the VM into the shared folder and see it or take it from
+your host machine in that folder
+Is a mapped/ mounted folder
