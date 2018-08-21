@@ -159,7 +159,7 @@ Is a mapped/ mounted folder
         
  - Vagrantfile code for JSON:
  
-        dVagrant.configure("2") do |config|
+        Vagrant.configure("2") do |config|
 
         config.vm.synced_folder "shared", "/home/vagrant/shared"
 
