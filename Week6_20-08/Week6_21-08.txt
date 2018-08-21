@@ -81,3 +81,35 @@ else
 	guests = YAML.load_file("guest_machines.yml")
 	puts 'yml exists'
 end
+
+--------------------
+Ruby Lambdas Scripts Examples
+
+#!/usr/bin/env ruby
+
+def fun
+        say_hello = lambda { |name| print "#{name}\n" }
+        say_hello.call("ab")
+
+        sayhello = -> (param) { print "#{param}\n" }
+        sayhello["hi"]
+
+end
+
+fun
+---------------------
+
+#!/usr/bin/env ruby
+
+test_function = lambda { |name| print "#{name}\n"}
+
+
+def run_it(func)
+        func
+end
+
+run_it(test_function["hi"])
+run_it(test_function.call("ab"))
+
+
+------------
