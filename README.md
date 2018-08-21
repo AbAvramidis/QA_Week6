@@ -126,3 +126,48 @@ Vagrant - Hypervisor - control manage and monitor the VMs creation, installation
 - Basically, you can copy anything through the VM into the shared folder and see it or take it from
 your host machine in that folder
 Is a mapped/ mounted folder
+
+# Implement a JSON file
+
+ - At first check if a JSON file exists or a YMAL file.
+ 
+        if(File.file?('servers.json'))
+          servers = JSON.parse(File.read('servers.json'))
+          puts 'json exists'
+        else
+          guests = YAML.load_file("guest_machines.yml")
+          puts 'yml exists'
+        end
+        
+        
+  -  At the top of the vagrantfile add:
+       
+          require 'json'
+          servers = JSON.parse(File.read('servers.json'))
+
+ - Example of VMs box definition:
+     
+        [{
+          "name": "server",
+          "box": "centos/7",
+          "ram": 512,
+          "vcpu": 1,
+          "ip_addr": "10.10.10.10"
+        }]
+        
+ - Vagrantfile code for JSON:
+ 
+        dVagrant.configure("2") do |config|
+
+        config.vm.synced_folder "shared", "/home/vagrant/shared"
+
+          servers.each do |server|
+             config.vm.define server['name'] do |srv|
+                srv.vm.box = server['box']
+                srv.vm.network 'private_network', ip: server['ip_addr']
+                srv.vm.provider "virtualbox" do |vb|
+                    vb.memory = server ['ram']
+                    vb.cpus = server ['vcpu']
+                end
+            end
+        end
