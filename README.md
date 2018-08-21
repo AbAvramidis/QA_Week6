@@ -117,6 +117,26 @@ Vagrant - Hypervisor - control manage and monitor the VMs creation, installation
       scripts:
       - startup
       
+ # Use of automate bash scripts to install packages/services 
+      
+      guest_vm.vm.provision "shell", privileged: false, path: "vagrant_script/jenkins_server.sh"
+      
+ - For example to automate the installation process for Jenkins Box Server use the following code script:
+ 
+    
+       #!/bin/bash
+        sudo yum install -y git
+        sudo yum install -y wget 
+        sudo yum install -y epel-release
+        sudo yum update
+        sudo useradd jenkins
+        sudo yum install -y java-1.8.0-openjdk.x86_64
+        cd ~ && sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+        sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+        sudo yum install -y jenkins
+        sudo systemctl start jenkins.service
+        sudo systemctl enable jenkins.service
+      
  # Note: for synced folders the VirtualBox Guest Additions plugin must be installed for Vagrant:  
  
     -  vagrant plugin install vagrant-vbguest
