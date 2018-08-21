@@ -6,7 +6,18 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 require 'yaml'
-guests = YAML.load_file("guest_machines.yml")
+
+require 'json'
+
+
+if(File.file?('servers.json'))
+	servers = JSON.parse(File.read('servers.json'))
+	puts 'json exists'
+else
+	guests = YAML.load_file("guest_machines.yml")
+	puts 'yml exists'
+end
+
 
 Vagrant.configure("2") do |config|
 
@@ -14,6 +25,20 @@ Vagrant.configure("2") do |config|
   # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
   # https://docs.vagrantup.com.
+
+  servers.each do |server|
+	config.vm.define server['name'] do |srv|
+		srv.vm.box = server['box']
+		srv.vm.network 'private_network', ip: server['ip_addr']
+		srv.vm.provider "virtualbox" do |vb|
+			vb.memory = server ['ram']
+			vb.cpus = server ['vcpu']
+		end
+	end
+  end
+  
+
+=begin
 	guests.each do |guest|
 		config.vm.define guest['name'] do |guest_vm|
 			cpu_mem(guest, guest_vm)
@@ -50,7 +75,8 @@ def services(guest, guest_vm)
 	guest_vm.vm.network "forwarded_port", guest: 9000, host: guest['port_for']
 	end
 end
- 
+
+=end 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
   #config.vm.define "jenkins" do |jenkins|
