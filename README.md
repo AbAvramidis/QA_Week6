@@ -190,3 +190,16 @@ Is a mapped/ mounted folder
         sayhello["ilias"]
       end
       fun
+      
+- Another example of ruby methods with arguments:
+    
+      test_function = lambda { |name| print "#{name}\n"}
+      def run_it(func)
+        func
+      end
+      
+      run_it(test_function["hi"])
+      run_it(test_function.call("ab"))
+      
+  
+      
