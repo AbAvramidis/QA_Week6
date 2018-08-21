@@ -1,0 +1,83 @@
+Vagrant - Shared Folder - synced
+
+Vagrant.configure("2") do |config|
+  # other config here
+
+  config.vm.synced_folder "src/", "/srv/website"
+end
+
+
+Ruby:
+-----
+
+test = "hi"
+
+"#{ }"
+
+array.each do |thing| 
+
+end
+
+
+require 'yaml'
+config = YAML.load_file("file")
+
+
+
+JSON config file:
+----------------
+
+https://blog.scottlowe.org/2016/01/18/multi-machine-vagrant-json/
+
+At the top of the vagrantfile add:
+require 'json'
+servers = JSON.parse(File.read('servers.json'))
+
+
+example of VMs definition:
+
+[
+    {
+        "name": "jessie",
+        "box": "slowe/debian-81-x64",
+        "ram": 512,
+        "vcpu": 1,
+        "ip_addr": "192.168.100.101"
+    },
+
+    {
+        "name": "trusty",
+        "box": "slowe/ubuntu-trusty-x64",
+        "ram": 512,
+        "vcpu": 1,
+        "ip_addr": "192.168.100.102"
+    }
+]
+
+
+Vagrant.configure("2") do |config|
+
+	config.vm.synced_folder "shared", "/home/vagrant/shared"
+
+
+  servers.each do |server|
+	config.vm.define server['name'] do |srv|
+		srv.vm.box = server['box']
+		srv.vm.network 'private_network', ip: server['ip_addr']
+		srv.vm.provider "virtualbox" do |vb|
+			vb.memory = server ['ram']
+			vb.cpus = server ['vcpu']
+		end
+	end
+  end
+
+Check if json file exists or yaml
+-----------------------------------
+
+if(File.file?('servers.json'))
+	servers = JSON.parse(File.read('servers.json'))
+	puts 'json exists'
+else
+	guests = YAML.load_file("guest_machines.yml")
+	puts 'yml exists'
+end
