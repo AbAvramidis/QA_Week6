@@ -6,25 +6,16 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 require 'yaml'
-
 require 'json'
 
 
 if(File.file?('servers.json'))
 	servers = JSON.parse(File.read('servers.json'))
 	puts 'json exists'
-else
-	guests = YAML.load_file("guest_machines.yml")
-	puts 'yml exists'
-end
-
-
-Vagrant.configure("2") do |config|
+	
+	Vagrant.configure("2") do |config|
 
 	config.vm.synced_folder "shared", "/home/vagrant/shared"
-  # The most common configuration options are documented and commented below.
-  # For a complete reference, please see the online documentation at
-  # https://docs.vagrantup.com.
 
   servers.each do |server|
 	config.vm.define server['name'] do |srv|
@@ -37,15 +28,26 @@ Vagrant.configure("2") do |config|
 	end
   end
   
+end  
+else
+	guests = YAML.load_file("guest_machines.yml")
+	puts 'yml exists'
 
-=begin
+
+
+	Vagrant.configure("2") do |config|
+
+	config.vm.synced_folder "shared", "/home/vagrant/shared"
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+
 	guests.each do |guest|
 		config.vm.define guest['name'] do |guest_vm|
 			cpu_mem(guest, guest_vm)
 			box(guest, guest_vm)
 			network_conf(guest, guest_vm)
 			services(guest, guest_vm)
-			
 		end
 	end
   
@@ -76,7 +78,7 @@ def services(guest, guest_vm)
 	end
 end
 
-=end 
+
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
   #config.vm.define "jenkins" do |jenkins|
@@ -165,4 +167,5 @@ end
   #   apt-get update
   #   apt-get install -y apache2
   # SHELL
+end
 end
