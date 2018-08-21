@@ -9,6 +9,8 @@ require 'yaml'
 guests = YAML.load_file("guest_machines.yml")
 
 Vagrant.configure("2") do |config|
+
+	config.vm.synced_folder "shared", "/home/vagrant/shared"
   # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
   # https://docs.vagrantup.com.
@@ -18,6 +20,7 @@ Vagrant.configure("2") do |config|
 			box(guest, guest_vm)
 			network_conf(guest, guest_vm)
 			services(guest, guest_vm)
+			
 		end
 	end
   
@@ -37,9 +40,15 @@ def network_conf(guest, guest_vm)
 end
 
 def services(guest, guest_vm)
+	if guest['package_manager'] == "apk"
+		guest_vm.vm.provision "shell", inline: "sudo #{guest['package_manager']} update -y"
+	elsif guest['package_manager'] == "apt"
+		guest_vm.vm.provision "shell", inline: "sudo #{guest['package_manager']} update -y"
+	else
 	guest_vm.vm.provision "shell", inline: "sudo #{guest['package_manager']} update -y"
 	guest_vm.vm.provision "shell", privileged: false, path: "vagrant_script/python_server.sh"
 	guest_vm.vm.network "forwarded_port", guest: 9000, host: guest['port_for']
+	end
 end
  
   # Every Vagrant development environment requires a box. You can search for
