@@ -173,3 +173,20 @@ Is a mapped/ mounted folder
                 end
             end
         end
+
+# Ruby Lambdas Scripts Examples
+
+- Create a ruby script, writing at the top:
+
+      #!/usr/bin/env ruby
+   
+- Define a function and call it at the end:
+
+      def fun
+        say_hello = lambda { |name| print "#{name}\n" }
+        say_hello.call("ab")
+        
+        sayhello = -> (name) { print "#{name}\n" }
+        sayhello["ilias"]
+      end
+      fun
