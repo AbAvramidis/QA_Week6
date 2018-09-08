@@ -1,0 +1,154 @@
+Commands:
+
+Check the Centos Version
+------------------------
+1)rpm --query centos-release
+2)hostnamectl
+
+dockerhub
+
+
+Install docker:
+--------------
+1)sudo yum install -y docker
+2)sudo docker ps
+3) sudo systemctl start docker
+
+If you want access to docker group you have to add the group and 
+add your account
+
+4)sudo groupadd docker
+5) add the vagrant user to that group
+6) sudo usermod -aG docker vagrant 
+7) sudo systemctl restart docker
+8) sudo systemctl enable docker
+
+
+Docker _Images:
+--------------
+
+Docker Registry
+Find the image that you want
+1) docker search jenkins
+or docker search minecraft
+docker search alpine
+
+Grap that image
+2)docker pull <name>
+
+find local images
+3) docker images
+
+4)docker run -d -it alpine sh  //  docker run -d -it <name> bash/or sh // the -d means detouched
+So docker run -it alpine sh
+
+To install packeges bash into Alpine use:
+apk add bash
+
+
+See the running Containers:
+1)docker ps
+2)docker ps -a
+3)docker stop <name> or <id>
+
+If you want to remove a container you need first to stop the container
+4)docker rm <name> _space_ for multiple
+
+If you want to remove an image then:
+5)docker rmi <name_id>
+
+6)docker logs <name>
+
+7)docker ps -qa shows us the Container IDs of the containers 
+
+Insstall JENKINS server for Alpine:
+----------------------------------
+
+docker run -d --name jenkins -p 9000:8080 jenkins:alpine   //--name for , -p ports of the host and container then, jenkins:alpine I want jenkins for alpine 
+If you run on browser IP of the vagrant and port 10.0.10.10:9000  you can see jenkins server
+
+Create a Makefile:
+-----------------
+
+.PHONY = dock_jenk stop_ remove_ find_
+name= "jenkins"
+port= "9000"
+
+
+dock_jenk:
+	docker run -d --name ${name} -p ${port}:8080 jenkins:alpine
+	docker ps -a	
+	docker logs jenkins | grep -A1 'installation'	
+stop_:
+	docker stop ${name}
+remove_:
+	docker rm ${name}
+find_:
+	x=$(shell docker ps -qa)
+	@echo $x
+
+
+Bob- Docker -jenkins
+---------------------
+
+Clone the repo or Fork it 
+If exists a dockerfile
+
+docker build -t test/jenkins:latest .
+
+Image Building
+-------------
+docker build -t user/name .
+
+-updating
+-docker login
+-docker push image_name
+
+docker start if a container is in Exit state
+
+
+
+----------------------
+docker build -t "dockerhub username"/jenkins:latest
+mvn clean package
+mvn clean install 
+
+
+
+
+
+Create your image at Docker Hub and pull your image from Docker Hub:
+-------------------------------------------------------------------
+docker login
+docker tag test/jenkins docker.io/"repo at dockerhub"
+docker push docker.io/"repo at dockerhub"
+
+docker pull abrams88/docker_images
+
+
+
+
+mvn is similar to gcc 
+produce a jar and run the jar
+
+
+
+--------------
+to dockerfile create an image
+build based on this image 
+and run a containers of this image
+
+docker build -t myimage:latest .
+ docker run -d -p 9966:9966 abrams/ab
+
+docker run -it myimage
+
+-------------------
+Abrams88/spring-petclinic-rest
+1)1
+./mvnw clean install
+2)
+since there is a Dockerfile
+docker build -t abrams/ab .
+3) docker run -d -p 9966:9966 abrams/ab
+

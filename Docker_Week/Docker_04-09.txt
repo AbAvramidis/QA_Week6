@@ -1,0 +1,62 @@
+/home/vagrant/Docker/examples/hello_world
+
+
+Web Sources:
+------------
+https://runnable.com/docker/python/dockerize-your-python-application
+https://djangostars.com/blog/what-is-docker-and-how-to-use-it-with-python/
+
+
+
+DockerFile:
+
+From, Copy, Run (during the build process)
+Entrypoint (during the run)
+ 
+docker build -t java-abrams/ab:helloworld .
+
+[vagrant@localhost Java]$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+java-abrams/ab      helloworld          cc50b83bd9fa        4 seconds ago       643 MB
+
+docker run cc50b83bd9fa
+-----------------------------------
+
+
+nodejs
+groovy
+
+jenkins 
+nexus 3
+gogs
+
+
+Jenkins:
+tomcat / wildfly -> unzip on deployments folder
+-> jenkins.war 
+
+
+Docker RUN and Entrypoint
+
+
+----------------
+gogs
+
+dockerfile:
+from centos:7
+run yum install -y wget unzip git 
+run wget
+unzip 
+entrypoint ["/gogs/gogs","web"]
+
+
+docker run --name gogs-mysql -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=gogs -d mysql:5.7
+docker run -p 3000:3000 --link gogs-mysql:gogs-mysql gogs  ## gogs-mysql the name of container
+
+
+----------------------
+
+docker build --no-cache -t gogs/ab:gogs .
+docker run --name gogs_ab -it ea504e21582b
+ docker start bf83a0708e8c
+docker exec -it gogs_ab pwd

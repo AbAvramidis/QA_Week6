@@ -1,0 +1,109 @@
+https://severalnines.com/blog/mysql-docker-building-container-image
+
+
+https://rominirani.com/tutorial-getting-started-with-kubernetes-on-your-windows-laptop-with-minikube-3269b54a226
+https://kubernetes.io/docs/tutorials/kubernetes-basics/deploy-app/deploy-interactive/
+.\minikube.exe dashboard --url=true
+https://github.com/kubernetes/minikube/releases
+https://kubernetes-cn.github.io/docs/tasks/tools/install-kubectl/
+gcloud components install kubectl
+kubectl get nodes
+
+1) Install gcloud from cmd		#https://cloud.google.com/sdk/docs/quickstart-windows
+2) install kubectl from gcloud		https://github.com/kubernetes/minikube/releases
+3) install minikube 
+
+minikube start
+minikube status
+minikube ip
+
+
+C:\Users\Admin\AppData\Local\Google\Cloud SDK>kubectl get nodes
+NAME       STATUS    ROLES     AGE       VERSION
+minikube   Ready     master    2h        v1.10.0
+
+
+kubectl run python-http-server --image=bobcrutchley/python-http-server:latest --port=9000
+kubectl run <name> --image=<name> --port=port
+
+kubectl get deployments
+kubectl describe deployment <name>
+or 
+kubectl describe deployments 
+kubectl get pods
+kubectl expose deployment python-http-server --type NodePort --port 9000
+
+kubectl get services
+take the minikube ip and with port check the services
+
+kubectl scale deployment python-http-server --replicas=2     #replicates
+
+kubectl delete deployment python-http-server  = pods
+kubectl delete service python-http-server
+
+
+1)At first we do a kuebctl run image
+2) then kebctl get deployments
+
+The pods depends on the deployment not the service
+
+UPDATE 
+
+kubectl set image deployment <name> <name>=<name>:tag    #update the <name> is the name of the image
+kubectl rollout status deployment <name>   #status
+
+So you need an object like a service, that gives those pods a stable IP
+The service is like a gateway for the pods, each pod has its own IP address
+The way to manage and talk to all the pods and have load balance between them its through SERVICE.
+logical layer works like a load balancer
+
+-------
+Kubectl to Google Cloud
+
+C:\Users\Admin>gcloud version
+Google Cloud SDK 215.0.0
+bq 2.0.34
+core 2018.09.04
+gsutil 4.33
+kubectl 2018.08.17
+
+[23] europe-west2-c
+gcloud container clusters create <name> --zone europe-west2-c
+
+
+From cmd 
+1)At first do gcloud init
+2) Log in to gcloud account
+3)select project
+4)select region (23) europe-west2-c
+5)gcloud container clusters create <any name> --zone europe-west2-c
+6) copy the link and enable the API ( Kubernetes Engine API enable)
+7) again gcloud container clusters create
+8) ......creating....done
+Creating cluster pythonserver...done.
+Created [https://container.googleapis.com/v1/projects/abrams-214214/zones/europe-west2-c/clusters/pythonserver].
+To inspect the contents of your cluster, go to: https://console.cloud.google.com/kubernetes/workload_/gcloud/europe-west2-c/pythonserver?project=abrams-214214
+kubeconfig entry generated for pythonserver.
+NAME          LOCATION        MASTER_VERSION  MASTER_IP      MACHINE_TYPE   NODE_VERSION  NUM_NODES  STATUS
+pythonserver  europe-west2-c  1.9.7-gke.6     35.189.77.137  n1-standard-1  1.9.7-gke.6   3          RUNNING
+
+
+kubectl run ......
+kubectl expose deployment python-http-server --type LoadBalancer --port 9000 --target-port 9000
+kubectl get service python-http-server 
+
+https://cloud.google.com/kubernetes-engine/docs/quickstart
+----------------------------------------
+
+that creates a deployment
+https://github.com/Abrams88/python-http-server-ci
+1)Create a YML file..
+2)create -f python.yml
+
+https://kubernetes.io/docs/tutorials/kubernetes-basics/expose/expose-intro/
+---------------------
+
+
+kubectl expose pod tracker-docker --type LoadBalancer --port 80 --target-port 8080
+
+

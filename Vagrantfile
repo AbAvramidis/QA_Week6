@@ -37,6 +37,7 @@ config.vm.synced_folder "shared", "/home/vagrant/shared"
 				network_conf(guest, guest_vm)
 				services(guest, guest_vm)
 				guest_vm.vm.synced_folder "shared", "/home/vagrant/shared"
+				scripts(guest, guest_vm)
 			end
 		end
   
@@ -62,9 +63,17 @@ config.vm.synced_folder "shared", "/home/vagrant/shared"
 			guest_vm.vm.provision "shell", inline: "sudo #{guest['package_manager']} update -y"
 		else
 		guest_vm.vm.provision "shell", inline: "sudo #{guest['package_manager']} update -y"
+		#guest_vm.vm.provision "shell", inline: "sudo #{guest['package_manager']} install -y #{guest['packages']}"
 		#guest_vm.vm.provision "shell", privileged: false, path: "vagrant_script/python_server.sh"
-		guest_vm.vm.provision "shell", privileged: false, path: "vagrant_script/jenkins_server.sh"
-		guest_vm.vm.network "forwarded_port", guest: 9000, host: guest['port_for']
+		#guest_vm.vm.provision "shell", privileged: false, path: "vagrant_script/jenkins_server.sh"
+		#guest_vm.vm.network "forwarded_port", guest: 9000, host: guest['port_for']
+		
+		end
+	end
+	
+	def scripts(guest, guest_vm)
+		guest['scripts'].each do |script|
+			guest_vm.vm.provision "shell", privileged: false, path: "vagrant_script/#{script}"
 		end
 	end
 

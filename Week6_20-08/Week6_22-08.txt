@@ -1,0 +1,133 @@
+Vagrantfile: 
+1) add scripts 
+YML file:
+- name: jenkins
+  box: centos/7
+  cpus: 2
+  memory: 4096 
+  private_ip: 10.0.10.10
+  package_manager: yum
+  port_for: 9000
+  packages:
+  - wget
+  - unzip
+  - git
+  scripts:
+  - startup
+  - terraform
+  - google_cloud_sdk
+
+
+	def scripts(guest, guest_vm)
+		guest['scripts'].each do |script|
+			guest_vm.vm.provision "shell", privileged: false, path: "vagrant_script/#{script}"
+		end
+	end
+
+--------------------------------
+Google Cloud Platforms:
+
+
+[vagrant@localhost ~]$ gcloud -v
+Google Cloud SDK 213.0.0
+bq 2.0.34
+core 2018.08.17
+gsutil 4.33
+[vagrant@localhost ~]$ terraform -v
+Terraform v0.11.8
+
+----------
+the google_cloud_sdk, terraform file , take a copy of it from raw add a new file
+and run it as a script
+----------------
+
+Terraform config file
+-----------------------
+.tf
+// comments 
+/* */  comments
+
+
+1) Create a file 01_provider.tf
+Region : VM instances
+project : project ID 
+  	
+credentials = "${file("~/credentials.json")}" 
+project = "iliasproject-214108" 
+region = "europe-west2" 
+
+2)terraform init 
+3)terraform plan 
+copy the key to the folder
+4) terraform destroy 
+5) terraform apply
+^) from google cloud -> Compute Engine -> VM instances -> SSH button and boom!!!
+
+
+
+        metadata {
+                sshKeys = "terraform:${file("~/.ssh/id_rsa.pub")}"
+        }
+        provisioner "remote-exec" {
+                connection = {
+                        type = "ssh"
+                        user = "terraform"
+                        private_key = "${file("~/.ssh/id_rsa")}"
+                }
+                inline = [
+                #       
+                        "sudo yum update -y"
+                ]
+		scripts = [
+                	"scripts/test1"
+                ]
+
+        }
+
+
+
+network tag 
+allow TCP:9000
+
+ssh 22 
+http 9000
+
+ssh -L 9000:localhost:9000 terraform@35.....
+
+
+
+----------------
+
+
+resource "google_compute_instance" "default" {
+        name = "${var.name}"
+        machine_type = "${var.machine_type}"
+        zone = "${var.zone}"
+        boot_disk {
+                initialize_params {
+                        image = "${var.image}"
+                }
+
+        }
+        network_interface {
+                network = "${var.network_interface}"
+                access_config {
+                        // IP
+                }
+        }
+        metadata {
+                sshKeys = "${var.user}:${file("~/.ssh/id_rsa.pub")}"
+        }
+        provisioner "remote-exec" {
+                connection = {
+                        type = "ssh"
+                        user = "${var.user}"
+                        private_key = "${file("~/.ssh/id_rsa")}"
+                }
+                inline = [
+                        "sudo yum update -y"
+                ]
+                scripts = [
+                #        "terrascripts/${var.script}"
+                ]
+
